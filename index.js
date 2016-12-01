@@ -18,7 +18,7 @@ function bindingify (file) {
   }
 
   function flush (cb) {
-    decoder.end()
+    src += decoder.end()
 
     var output = falafel(src, function (node) {
       if (node.type !== 'CallExpression') return
