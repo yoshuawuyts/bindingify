@@ -1,6 +1,6 @@
 {
   "name": "bindingify",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Transform native bindings to be relative to their file",
   "main": "index.js",
   "scripts": {
