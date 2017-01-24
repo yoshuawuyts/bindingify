@@ -21,17 +21,31 @@ function bindingify (file) {
     src += decoder.end()
 
     var output = falafel(src, function (node) {
-      if (node.type !== 'CallExpression') return
-      if (!node.arguments.length) return
-      if (!node.callee || !node.callee.arguments) return
-      if (!node.callee.arguments.length) return
+      var val, str
 
-      var requireLiteral = node.callee.arguments[0]
-      if (requireLiteral.value !== 'bindings') return
-
-      var val = node.arguments[0].value
-      var str = "{bindings: '" + val + "', module_root: __dirname}"
-      node.arguments[0].update(str)
+      if (
+        node.type === 'Literal' &&
+        /build\/Release/.test(node.value) &&
+        node.parent &&
+        node.parent.callee &&
+        node.parent.callee.type === 'Identifier' &&
+        node.parent.callee.name === 'require'
+      ) {
+        val = node.value
+        str = "require('path').join(__dirname, '" + val + "')"
+        node.update(str)
+      } else if (
+        node.type === 'CallExpression' &&
+        node.arguments.length &&
+        node.callee &&
+        node.callee.arguments &&
+        node.callee.arguments.length &&
+        node.callee.arguments[0].value === 'bindings'
+      ) {
+        val = node.arguments[0].value
+        str = "{bindings: '" + val + "', module_root: __dirname}"
+        node.arguments[0].update(str)
+      }
     })
 
     this.push(output.toString())
